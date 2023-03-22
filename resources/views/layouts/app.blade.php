@@ -52,6 +52,15 @@
                                 </li>
                             @endif
                         @else
+
+                            @can('only.admin')
+                                <li class="nav-item">
+                                    <a  class="nav-link" href="{{route('admin')}}" role="button" aria-haspopup="true" aria-expanded="false">
+                                        Admin panel
+                                    </a>
+                                </li>
+                            @endcan
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}

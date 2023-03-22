@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AdminController;
+
+use App\Http\Controllers\EmployeeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,11 +18,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-Route::get('/admin', function () {
-    return view('admin');
-});
+Route::get('/admin',[AdminController::class, 'index'])->name('admin');
+
+
+Route::resource('employee',EmployeeController::class );
+
+
+
 
 Auth::routes();
 
