@@ -16,16 +16,16 @@ class CreateEmployeesTable extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('position_id')->unique();
+            $table->unsignedBigInteger('position_id')->nullable();
             $table->foreign('position_id')->references('id')->on('positions');
-            $table->unsignedBigInteger('image_id')->unique();
+            $table->unsignedBigInteger('image_id')->nullable();
             $table->foreign('image_id')->references('id')->on('images');
             $table->timestamp('date_start_work');
             $table->string('phone');
-            $table->string('mail');
+            $table->string('email');
             $table->unsignedFloat('salary');
-            $table->unsignedInteger('admin_created_id');
-            $table->unsignedInteger('admin_updated_id');
+            $table->unsignedInteger('admin_created_id')->nullable();
+            $table->unsignedInteger('admin_updated_id')->nullable();
             $table->unsignedBigInteger('boss_id')->nullable();
             $table->foreign('boss_id')->references('id')->on('employees');
             $table->timestamps();
