@@ -6,9 +6,7 @@
     <title>Laravel</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
-
 </head>
 <body>
 @include('layouts.partials.admin_header')
@@ -21,11 +19,16 @@
     </div>
     <div class="content">
         <div class="container-fluid">
+            <div id='app'>
+
+            </div>
             @yield('content')
         </div>
     </div>
 </div>
-<div id='app'></div>
+
 <script src="{{ mix('js/app.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@yield('script')
 </body>
 </html>

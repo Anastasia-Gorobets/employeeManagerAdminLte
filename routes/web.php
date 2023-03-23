@@ -21,12 +21,13 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/admin',[AdminController::class, 'index'])->name('admin');
+Route::get('/admin2',[AdminController::class, 'index2'])->name('admin2');
 
 
 Route::resource('employee',EmployeeController::class );
 
 
-
+Route::get('/test', [EmployeeController::class, 'getList'])->name('employee.list');
 
 Auth::routes();
 

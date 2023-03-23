@@ -17,7 +17,7 @@ class EmployeeFactory extends Factory
         return [
             'name'=>$this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'date_start_work' => $this->faker->dateTimeThisYear(),
+            'date_start_work' => $this->faker->date($format = 'Y-m-d', $max = 'now'),
             'phone' => $this->faker->phoneNumber(),
             'salary' => $this->faker->randomFloat(2,10,1000)
         ];

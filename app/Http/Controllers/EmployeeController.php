@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class EmployeeController extends Controller
 {
@@ -18,10 +19,42 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $employees = [];
-        return view('employee.index', ['employees'=>$employees]);
+        return view('employee.index');
+    }
+
+    public function getList(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Employee::with('position')->with('boss')
+                ->get();
+
+            return DataTables::of($data)
+                ->editColumn('position', function ($row) {
+                    return $row->position->name;
+                })
+                ->editColumn('date_start_work', function ($row) {
+                    return $row->created_at->format('d.m.Y');
+                })
+                ->editColumn('salary', function ($row) {
+                    return '$'.$row->salary;
+                })
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('employee.edit', $row->id);
+                    $btnEdit = '<a href="' . $editUrl . '" class="btn btn-primary btn-sm">Edit</a>';
+                    $deleteUrl = route('employee.destroy', $row->id);
+                    $formDelete = '<form onsubmit="return confirmDelete(this)" class="deleteEmployeeForm" action="'.$deleteUrl.'" method="post">'.csrf_field().method_field('DELETE').'<button type="submit" class="btn btn-danger btn-sm">Delete</button></form>';
+                    return $btnEdit.' '.$formDelete;
+
+                    //{{ csrf_field() }}
+                    //        {{ method_field('DELETE') }}
+
+                })
+                ->rawColumns(['action'])
+
+                ->toJson();
+        }
     }
 
     /**
@@ -31,7 +64,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        //
+        return view('employee.create');
     }
 
     /**
@@ -53,7 +86,9 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        //
+        dd('show');
+
+
     }
 
     /**
@@ -87,6 +122,8 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        //
+        $employee->delete();
+        return redirect()->route('employee.index');
+
     }
 }
