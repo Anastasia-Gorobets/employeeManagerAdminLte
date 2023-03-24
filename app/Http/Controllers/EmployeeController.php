@@ -101,12 +101,12 @@ class EmployeeController extends Controller
         }
 
         if($request->hasFile('image')){
-            var_dump($request->file('image'));
-
-
             $path = $request->file('image')->store('employees_images', 'public');
 
             echo "path=";
+
+            echo public_path('storage/'.$path).'<br>';
+
             dd($path);
 
             $image = ImageFacade::make(public_path('storage/'.$path))
