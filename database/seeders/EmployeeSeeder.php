@@ -22,6 +22,30 @@ class EmployeeSeeder extends Seeder
 
         Employee::factory(10)->make()->each(function ($employee) use ($positions){
             $employee->position_id = $positions->random()->id;
+
+          /*  $all = Employee::all();
+            $bossId = 1;
+            if(Employee::count() > 0){
+                $bossId = $all->random()->id;
+            }
+            if($employee->id != 1){
+                $employee->boss_id = $bossId;
+            }*/
+
+            // Get a random boss from existing employees with a lower hierarchy level
+            $bosses = Employee::where('id', '<>', $employee->id)
+                ->where('id', '<>', 1)
+                ->where(function ($query) use ($employee) {
+                    $query->whereNull('boss_id')
+                        ->orWhere('boss_id', $employee->id);
+                })
+                ->get();
+
+            if ($bosses->isNotEmpty()) {
+                $boss = $bosses->random();
+                $employee->boss_id = $boss->id;
+            }
+
             $employee->save();
         });
 

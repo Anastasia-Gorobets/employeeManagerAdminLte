@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PositionRequest;
+use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\DataTables;
 
 class PositionController extends Controller
 {
@@ -14,7 +18,33 @@ class PositionController extends Controller
      */
     public function index()
     {
-        //
+        return view('positions.index');
+    }
+
+    public function getList(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Position::all();
+
+
+            return DataTables::of($data)
+                ->editColumn('updated_at', function ($row) {
+                    return date('d.m.Y', strtotime($row->updated_at));
+                })
+
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('position.edit', $row->id);
+                    $btnEdit = '<a class="btn btn-primary" href="' . $editUrl . '" ><i class="fa-solid fa-pen-to-square"></i> Edit</a>';
+                    $deleteUrl = route('position.destroy', $row->id);
+                    $formDelete = '<form onsubmit="return confirmDelete(this)" class="deletePositionForm mt-2" action="'.$deleteUrl.'" method="post">'.csrf_field().method_field('DELETE').'<button type="submit" class="btn btn-danger">
+    <i class="fa-solid fa-trash"></i> Delete</button></form>';
+                    return $btnEdit.' '.$formDelete;
+
+
+                })
+                ->rawColumns(['action'])
+                ->toJson();
+        }
     }
 
     /**
@@ -24,7 +54,7 @@ class PositionController extends Controller
      */
     public function create()
     {
-        //
+        return view('positions.create');
     }
 
     /**
@@ -33,9 +63,14 @@ class PositionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PositionRequest $request)
     {
-        //
+
+        $validated = $request->validated();
+        Position::create($validated);
+
+        return redirect()->route('position.index');
+
     }
 
     /**
@@ -57,7 +92,9 @@ class PositionController extends Controller
      */
     public function edit(Position $position)
     {
-        //
+
+        return view('positions.edit', ['position'=>$position]);
+
     }
 
     /**
@@ -67,9 +104,12 @@ class PositionController extends Controller
      * @param  \App\Models\Position  $position
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Position $position)
+    public function update(PositionRequest $request, Position $position)
     {
-        //
+        $validated = $request->validated();
+        $position->fill($validated);
+        $position->save();
+        return redirect()->route('position.index');
     }
 
     /**
@@ -80,6 +120,9 @@ class PositionController extends Controller
      */
     public function destroy(Position $position)
     {
-        //
+        $position->delete();
+        return redirect()->route('position.index');
+
+
     }
 }

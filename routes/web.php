@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 
 use App\Http\Controllers\EmployeeController;
+
+use App\Http\Controllers\AutocompleteController;
+
+use App\Http\Controllers\PositionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,10 +29,18 @@ Route::get('/admin2',[AdminController::class, 'index2'])->name('admin2');
 
 
 Route::resource('employee',EmployeeController::class );
+Route::resource('position',PositionController::class );
 
 
 Route::get('/test', [EmployeeController::class, 'getList'])->name('employee.list');
 
+Route::get('/position_list', [PositionController::class, 'getList'])->name('position.list');
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::controller(AutocompleteController::class)->group(function(){
+    Route::get('autocompleteEmployees', 'autocompleteEmployees')->name('autocomplete.employees');
+});
+

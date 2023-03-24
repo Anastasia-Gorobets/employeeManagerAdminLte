@@ -18,9 +18,7 @@ class CreateEmployeesTable extends Migration
             $table->string('name');
             $table->unsignedBigInteger('position_id')->nullable();
             $table->foreign('position_id')->references('id')->on('positions');
-            $table->unsignedBigInteger('image_id')->nullable();
-            $table->foreign('image_id')->references('id')->on('images');
-            $table->timestamp('date_start_work');
+            $table->date('date_start_work');
             $table->string('phone');
             $table->string('email');
             $table->unsignedFloat('salary');

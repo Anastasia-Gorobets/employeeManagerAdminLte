@@ -1,21 +1,19 @@
 @extends('layouts.admin_layout')
 
 @section('content')
+
     <div class="row mb-2">
         <div class="col-12">
-            <a href="{{route('employee.create')}}" class="btn btn-primary">Add item</a>
+            <a href="{{route('position.create')}}" class="btn btn-primary">Add item</a>
         </div>
     </div>
+
+
     <table class="table table-bordered yajra-datatable">
         <thead>
         <tr>
-            <th>Image</th>
             <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Position</th>
-            <th>Date of employment</th>
-            <th>Salary</th>
+            <th>Last updated</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -23,17 +21,12 @@
         </tbody>
     </table>
 
-
-
 @endsection
 
 @section('script')
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-
     <script>
-
         function confirmDelete(e){
             Swal.fire({
                 title: 'Are you sure?',
@@ -57,28 +50,15 @@
              $('.yajra-datatable').DataTable({
                 processing: true,
                 serverSide: true,
-
                 initComplete: function () {
                      // Add the form-control class to the search input
                      $('.dataTables_filter input[type="search"]').addClass('form-control d-inline-block w-auto');
                      $('.dataTables_length select').addClass('form-select d-inline-block w-auto');
                 },
-                ajax: "{{ route('employee.list') }}",
+                ajax: "{{ route('position.list') }}",
                 columns: [
-                    {  data: "image",
-                       name: 'image',
-                       "render": function (data) {
-                        if(data !== ''){
-                            return '<img style="height: 60px;border-radius: 30px;" src='+data+'>';
-                        }
-                       }
-                    },
                     {data: 'name', name: 'name'},
-                    {data: 'email', name: 'email'},
-                    {data: 'phone', name: 'phone'},
-                    {data: 'position', name: 'position'},
-                    {data: 'date_start_work', name: 'date_start_work'},
-                    {data: 'salary', name: 'salary'},
+                    {data: 'updated_at', name: 'updated_at'},
                     {
                         data: 'action',
                         name: 'action',

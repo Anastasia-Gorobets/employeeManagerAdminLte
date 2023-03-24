@@ -158,6 +158,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'boss_id' => 'Head'
+    ],
 
 ];

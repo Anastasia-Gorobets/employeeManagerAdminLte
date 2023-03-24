@@ -2,9 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmployeeRequest;
 use App\Models\Employee;
+use App\Models\Position;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Storage;
+
+
+use App\Models\Image;
+
+use Intervention\Image\Facades\Image as ImageFacade;
 
 class EmployeeController extends Controller
 {
@@ -31,24 +39,31 @@ class EmployeeController extends Controller
                 ->get();
 
             return DataTables::of($data)
+
+                ->editColumn('image', function ($row) {
+                    if ($row->image) {
+                        return Storage::url($row->image->path);
+                    }
+                    return  '/storage/employees_images/greyCircle.png';
+                })
                 ->editColumn('position', function ($row) {
                     return $row->position->name;
                 })
                 ->editColumn('date_start_work', function ($row) {
-                    return $row->created_at->format('d.m.Y');
+
+                    return date('d.m.Y', strtotime($row->date_start_work));
                 })
                 ->editColumn('salary', function ($row) {
                     return '$'.$row->salary;
                 })
                 ->addColumn('action', function ($row) {
                     $editUrl = route('employee.edit', $row->id);
-                    $btnEdit = '<a href="' . $editUrl . '" class="btn btn-primary btn-sm">Edit</a>';
+                    $btnEdit = '<a class="btn btn-primary" href="' . $editUrl . '" ><i class="fa-solid fa-pen-to-square"></i> Edit</a>';
                     $deleteUrl = route('employee.destroy', $row->id);
-                    $formDelete = '<form onsubmit="return confirmDelete(this)" class="deleteEmployeeForm" action="'.$deleteUrl.'" method="post">'.csrf_field().method_field('DELETE').'<button type="submit" class="btn btn-danger btn-sm">Delete</button></form>';
+                    $formDelete = '<form onsubmit="return confirmDelete(this)" class="deleteEmployeeForm mt-2" action="'.$deleteUrl.'" method="post">'.csrf_field().method_field('DELETE').'<button type="submit" class="btn btn-danger">
+    <i class="fa-solid fa-trash"></i> Delete</button></form>';
                     return $btnEdit.' '.$formDelete;
 
-                    //{{ csrf_field() }}
-                    //        {{ method_field('DELETE') }}
 
                 })
                 ->rawColumns(['action'])
@@ -64,18 +79,71 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('employee.create');
+        return view('employee.create', ['positions'=>Position::all()]);
     }
 
+
+    public function employeeSetRelations($request,$employee)
+    {
+
+        if($request->input('position')){
+            $position =  Position::find($request->input('position'));
+            if($position){
+                $employee->position()->associate($position)->save();
+            }
+        }
+
+        if($request->input('boss_id')){
+            $boss =  Employee::find($request->input('boss_id'));
+            if($boss){
+                $employee->boss()->associate($boss)->save();
+            }
+        }
+
+        if($request->hasFile('image')){
+            $path = $request->file('image')->store('employees_images', 'public');
+            $image = ImageFacade::make(public_path('storage/'.$path))
+                ->orientate() // autorotate the image if necessary
+                ->fit(300, 300, function ($constraint) {
+                    $constraint->aspectRatio(); // maintain aspect ratio
+                    $constraint->upsize(); // prevent upsizing
+                })
+                ->crop(300, 300, null, null, true) // crop the center of the image
+                ->encode('jpg', 80);
+
+            Storage::disk('public')->put($path, (string) $image);
+
+            if($employee->image){
+                Storage::delete($employee->image->path);
+                $employee->image->path =  $path;
+                $employee->image->save();
+            }else{
+                $employee->image()->create([
+                    'path' => $path
+                ]);
+            }
+
+        }
+
+
+    }
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EmployeeRequest $request)
     {
-        //
+        $validated = $request->validated();
+        $validated['date_start_work'] = date('Y-m-d', strtotime($validated['date_start_work']));
+
+        $employee = Employee::create($validated);
+
+        $this->employeeSetRelations($request, $employee);
+
+
+        return redirect()->route('employee.index');
     }
 
     /**
@@ -86,10 +154,9 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        dd('show');
-
 
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -99,7 +166,8 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
-        //
+        return view('employee.edit', ['employee'=>$employee,'positions'=>Position::all()]);
+
     }
 
     /**
@@ -109,9 +177,18 @@ class EmployeeController extends Controller
      * @param  \App\Models\Employee  $employee
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Employee $employee)
+    public function update(EmployeeRequest $request, Employee $employee)
     {
-        //
+        $validated = $request->validated();
+        $validated['date_start_work'] = date('Y-m-d', strtotime($validated['date_start_work']));
+
+        $employee->fill($validated);
+        $employee->save();
+
+        $this->employeeSetRelations($request, $employee);
+
+
+        return redirect()->route('employee.index');
     }
 
     /**
@@ -126,4 +203,6 @@ class EmployeeController extends Controller
         return redirect()->route('employee.index');
 
     }
+
+
 }

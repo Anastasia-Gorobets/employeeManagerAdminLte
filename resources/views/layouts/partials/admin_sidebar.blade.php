@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{route('home')}}" class="brand-link">
-        <span class="brand-text font-weight-light">AdminLTE 3</span>
+        <span class="brand-text font-weight-light">Employee Manager</span>
     </a>
 
     <!-- Sidebar -->
@@ -15,13 +15,13 @@
                 <li class="nav-item menu-open">
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{route('employee.index')}}" class="nav-link">
+                            <a href="{{route('employee.index')}}" class="nav-link {{ (request()->is('employee*')) ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Employees</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{route('position.index')}}" class="{{ (request()->is('position*')) ? 'active' : '' }} nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Positions</p>
                             </a>
