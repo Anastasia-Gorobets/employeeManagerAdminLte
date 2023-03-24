@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
         "yajra/laravel-datatables-oracle": "^9.21",
-        "fakerphp/faker": "^1.9.1"
+        "fakerphp/faker": "^1.9.1",
+        "ext-gd": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
