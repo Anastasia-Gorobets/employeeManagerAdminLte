@@ -120,11 +120,11 @@ class EmployeeController extends Controller
 
             if($employee->image){
                 Storage::delete($employee->image->path);
-                $employee->image->path =  $fullPath;
+                $employee->image->path =  $path;
                 $employee->image->save();
             }else{
                 $employee->image()->create([
-                    'path' => $fullPath
+                    'path' => $path
                 ]);
             }
 
