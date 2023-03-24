@@ -102,12 +102,12 @@ class EmployeeController extends Controller
 
         if($request->hasFile('image')){
             $path = $request->file('image')->store('employees_images', 'public');
-
-            echo $path . '<br>';
+            $fullPath = Storage::disk('public')->path($path);
+            /*echo $path . '<br>';
             echo public_path('storage/'.$path) . '<br>';
-            die;
+            die;*/
 
-            $image = ImageFacade::make(public_path('storage/'.$path))
+            $image = ImageFacade::make($fullPath)
                 ->orientate() // autorotate the image if necessary
                 ->fit(300, 300, function ($constraint) {
                     $constraint->aspectRatio(); // maintain aspect ratio
