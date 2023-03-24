@@ -105,9 +105,7 @@ class EmployeeController extends Controller
 
             echo "path=";
 
-            echo public_path('storage/'.$path).'<br>';
-
-            dd($path);
+            dd(public_path('storage/'.$path));
 
             $image = ImageFacade::make(public_path('storage/'.$path))
                 ->orientate() // autorotate the image if necessary
