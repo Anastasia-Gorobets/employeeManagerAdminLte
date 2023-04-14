@@ -59,6 +59,12 @@
                                         Admin panel
                                     </a>
                                 </li>
+
+                                <li class="nav-item">
+                                    <a  class="nav-link" href="{{route('admin2')}}" role="button" aria-haspopup="true" aria-expanded="false">
+                                        Admin panel vue
+                                    </a>
+                                </li>
                             @endcan
 
                             <li class="nav-item dropdown">

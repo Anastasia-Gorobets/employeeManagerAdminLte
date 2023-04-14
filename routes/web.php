@@ -39,8 +39,12 @@ Route::get('/position_list', [PositionController::class, 'getList'])->name('posi
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/allPositions', [App\Http\Controllers\PositionController::class, 'getAllPositions'])->name('allPositions');
 
 Route::controller(AutocompleteController::class)->group(function(){
     Route::get('autocompleteEmployees', 'autocompleteEmployees')->name('autocomplete.employees');
 });
 
+
+Route::resource('employeeapi',\App\Http\Controllers\Api\EmployeeController::class);
+Route::resource('positionapi',\App\Http\Controllers\Api\PositionController::class);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PositionRequest;
+use App\Http\Resources\PositionResource;
 use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Http\Request;
@@ -21,17 +22,21 @@ class PositionController extends Controller
         return view('positions.index');
     }
 
+    public function getAllPositions()
+    {
+        return PositionResource::collection(Position::all());
+
+    }
+
     public function getList(Request $request)
     {
         if ($request->ajax()) {
             $data = Position::all();
 
-
             return DataTables::of($data)
                 ->editColumn('updated_at', function ($row) {
                     return date('d.m.Y', strtotime($row->updated_at));
                 })
-
                 ->addColumn('action', function ($row) {
                     $editUrl = route('position.edit', $row->id);
                     $btnEdit = '<a class="btn btn-primary" href="' . $editUrl . '" ><i class="fa-solid fa-pen-to-square"></i> Edit</a>';
@@ -39,8 +44,6 @@ class PositionController extends Controller
                     $formDelete = '<form onsubmit="return confirmDelete(this)" class="deletePositionForm mt-2" action="'.$deleteUrl.'" method="post">'.csrf_field().method_field('DELETE').'<button type="submit" class="btn btn-danger">
     <i class="fa-solid fa-trash"></i> Delete</button></form>';
                     return $btnEdit.' '.$formDelete;
-
-
                 })
                 ->rawColumns(['action'])
                 ->toJson();

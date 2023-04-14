@@ -1,9 +1,6 @@
 @extends('layouts.admin_layout')
-
 @section('content')
-
     <h1>Edit employee</h1>
-
     <form method="POST" action="{{route('employee.update', ['employee'=>$employee->id])}}" enctype="multipart/form-data">
         @csrf
         @method('PUT')

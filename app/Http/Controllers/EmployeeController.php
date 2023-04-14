@@ -35,8 +35,7 @@ class EmployeeController extends Controller
     public function getList(Request $request)
     {
         if ($request->ajax()) {
-            $data = Employee::with('position')->with('boss')
-                ->get();
+            $data = Employee::withRelations()->get();
 
             return DataTables::of($data)
 
@@ -63,8 +62,6 @@ class EmployeeController extends Controller
                     $formDelete = '<form onsubmit="return confirmDelete(this)" class="deleteEmployeeForm mt-2" action="'.$deleteUrl.'" method="post">'.csrf_field().method_field('DELETE').'<button type="submit" class="btn btn-danger">
     <i class="fa-solid fa-trash"></i> Delete</button></form>';
                     return $btnEdit.' '.$formDelete;
-
-
                 })
                 ->rawColumns(['action'])
 
@@ -83,55 +80,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function employeeSetRelations($request,$employee)
-    {
 
-        if($request->input('position')){
-            $position =  Position::find($request->input('position'));
-            if($position){
-                $employee->position()->associate($position)->save();
-            }
-        }
-
-        if($request->input('boss_id')){
-            $boss =  Employee::find($request->input('boss_id'));
-            if($boss){
-                $employee->boss()->associate($boss)->save();
-            }
-        }
-
-        if($request->hasFile('image')){
-            $path = $request->file('image')->store('employees_images', 'public');
-            $fullPath = Storage::disk('public')->path($path);
-            /*echo $path . '<br>';
-            echo public_path('storage/'.$path) . '<br>';
-            die;*/
-
-            $image = ImageFacade::make($fullPath)
-                ->orientate() // autorotate the image if necessary
-                ->fit(300, 300, function ($constraint) {
-                    $constraint->aspectRatio(); // maintain aspect ratio
-                    $constraint->upsize(); // prevent upsizing
-                })
-                ->crop(300, 300, null, null, true) // crop the center of the image
-                ->encode('jpg', 80);
-
-            Storage::disk('public')->put($path, (string) $image);
-
-            if($employee->image){
-                Storage::delete($employee->image->path);
-                $employee->image->path =  $path;
-                $employee->image->save();
-            }else{
-                $employee->image()->create([
-                    'path' => $path
-                ]);
-            }
-
-        }
-
-
-    }
     /**
      * Store a newly created resource in storage.
      *
@@ -145,7 +94,7 @@ class EmployeeController extends Controller
 
         $employee = Employee::create($validated);
 
-        $this->employeeSetRelations($request, $employee);
+        $employee->employeeSetRelations($request, $employee);
 
 
         return redirect()->route('employee.index');
@@ -185,12 +134,14 @@ class EmployeeController extends Controller
     public function update(EmployeeRequest $request, Employee $employee)
     {
         $validated = $request->validated();
+
+
         $validated['date_start_work'] = date('Y-m-d', strtotime($validated['date_start_work']));
 
         $employee->fill($validated);
         $employee->save();
 
-        $this->employeeSetRelations($request, $employee);
+        $employee->employeeSetRelations($request, $employee);
 
 
         return redirect()->route('employee.index');

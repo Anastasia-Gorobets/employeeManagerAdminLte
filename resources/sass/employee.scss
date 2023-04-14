@@ -4,3 +4,14 @@
     height: $image-size;
     width: $image-size;
 }
+
+.router-link-active{
+    background-color: $active-link-bg!important;
+}
+
+.editEmployeeLink, .deleteEmployeeForm{
+    padding: 5px;
+}
+.deleteEmployeeForm{
+    margin-top: 5px;
+}

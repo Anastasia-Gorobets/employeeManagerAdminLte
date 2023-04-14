@@ -44,12 +44,15 @@ class EmployeeObserver
 
     public function deleting(Employee $employee)
     {
+
         $employee->subordinates->map(function ($subordinate) use ($employee) {
             $boss =  Employee::find($employee->boss_id);
             if($boss){
                 $subordinate->boss()->associate($boss)->save();
             }
         });
+
+
 
     }
 
